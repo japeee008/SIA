@@ -2,6 +2,7 @@ package com.appdevg5.powerpuff.citucare.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import com.appdevg5.powerpuff.citucare.enums.Role;
 
 @Entity
 @Table(name = "users")
@@ -24,11 +25,9 @@ public class User {
     @Column(nullable = false, length = 255)
     private String password;
 
-    @Column(nullable = false, length = 50)
-    private String role;
-
-    @Column(nullable = false, name = "is_admin")
-    private Boolean isAdmin = false;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
     @Column(nullable = false, name = "created_at")
     private LocalDateTime createdAt;
@@ -37,20 +36,17 @@ public class User {
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "department_id", nullable = false)
+    @JoinColumn(name = "department_id", nullable = true)
     private Department department;
 
-    public User() {
-    }
+    public User() {}
 
-    public User(String fname, String lname, String email, String password, String role, 
-                Boolean isAdmin, Department department) {
+    public User(String fname, String lname, String email, String password, Role role, Department department) {
         this.fname = fname;
         this.lname = lname;
         this.email = email;
         this.password = password;
         this.role = role;
-        this.isAdmin = isAdmin != null ? isAdmin : false;
         this.department = department;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
@@ -96,20 +92,12 @@ public class User {
         this.password = password;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
-    }
-
-    public Boolean getIsAdmin() {
-        return isAdmin;
-    }
-
-    public void setIsAdmin(Boolean isAdmin) {
-        this.isAdmin = isAdmin != null ? isAdmin : false;
     }
 
     public LocalDateTime getCreatedAt() {
