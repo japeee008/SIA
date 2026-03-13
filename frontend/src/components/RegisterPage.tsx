@@ -9,6 +9,7 @@ const RegisterPage: React.FC = () => {
     studentId: "",
     email: "",
     password: "",
+    confirmPassword: "",
     fname: "",
     lname: "",
     middleInitial: ""
@@ -28,6 +29,11 @@ const RegisterPage: React.FC = () => {
       return;
     }
 
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
     try {
 
       const res = await fetch("http://localhost:8080/api/auth/register", {
@@ -42,20 +48,22 @@ const RegisterPage: React.FC = () => {
         alert("Registration successful");
         navigate("/");
       } else {
-        alert("Registration failed");
+        const text = await res.text();
+        alert(text || "Registration failed");
       }
 
     } catch (err) {
       console.error(err);
+      alert("Server error");
     }
 
   };
 
   return (
 
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-maroon">
 
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6 space-y-4">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-8 space-y-4">
 
         <h2 className="text-2xl font-bold text-gray-900 text-center">
           Register
@@ -67,14 +75,14 @@ const RegisterPage: React.FC = () => {
             name="studentId"
             placeholder="Student ID"
             onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-lg"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:outline-none"
           />
 
           <input
             name="email"
             placeholder="Institutional Email"
             onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-lg"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:outline-none"
           />
 
           <input
@@ -82,44 +90,52 @@ const RegisterPage: React.FC = () => {
             name="password"
             placeholder="Password"
             onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-lg"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:outline-none"
+          />
+
+          <input
+            type="password"
+            name="confirmPassword"
+            placeholder="Confirm Password"
+            onChange={handleChange}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:outline-none"
           />
 
           <input
             name="fname"
             placeholder="First Name"
             onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-lg"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:outline-none"
           />
 
           <input
             name="lname"
             placeholder="Last Name"
             onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-lg"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:outline-none"
           />
 
           <input
             name="middleInitial"
             placeholder="Middle Initial"
             onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-lg"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:outline-none"
           />
 
         </div>
 
-        <div className="flex gap-3 pt-2">
+        <div className="flex gap-3 pt-3">
 
           <button
             onClick={() => navigate("/")}
-            className="flex-1 border border-gray-300 py-2 rounded-lg hover:bg-gray-100"
+            className="flex-1 border border-gray-300 py-2 rounded-lg hover:bg-gray-100 transition"
           >
             Cancel
           </button>
 
           <button
             onClick={handleRegister}
-            className="flex-1 bg-red-700 text-white py-2 rounded-lg hover:bg-red-800"
+            className="flex-1 bg-gold text-black py-2 rounded-lg font-medium hover:bg-yellow-500 transition"
           >
             Register
           </button>
@@ -129,7 +145,9 @@ const RegisterPage: React.FC = () => {
       </div>
 
     </div>
+
   );
+
 };
 
 export default RegisterPage;

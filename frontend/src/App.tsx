@@ -1,26 +1,38 @@
 import React from 'react';
 import AdminRoute from "./routes/AdminRoute";
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
 import ChatContainer from './components/ChatContainer';
 import AdminPanel from './pages/AdminPanel';
-import LoginPage from './components/LoginPage'; 
-import ErrorBoundary from './components/ErrorBoundary';
-import { ChatProvider } from './context/ChatContext';
+import LoginPage from './components/LoginPage';
 import RegisterPage from "./components/RegisterPage";
 import UserLoginPage from "./components/UserLoginPage";
+
+import ForgotPasswordPage from "./components/ForgotPasswordPage";
+import ResetPasswordPage from "./components/ResetPasswordPage";
+
+import ErrorBoundary from './components/ErrorBoundary';
+import { ChatProvider } from './context/ChatContext';
 
 function App() {
   return (
     <ErrorBoundary>
       <ChatProvider>
         <Router>
+
           <Routes>
 
-            {/* Default page */}
+            {/* Default user login */}
             <Route path="/" element={<UserLoginPage />} />
 
             {/* Registration */}
             <Route path="/register" element={<RegisterPage />} />
+
+            {/* Forgot password */}
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+
+            {/* Reset password */}
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
 
             {/* Chatbot */}
             <Route
@@ -46,6 +58,7 @@ function App() {
             />
 
           </Routes>
+
         </Router>
       </ChatProvider>
     </ErrorBoundary>

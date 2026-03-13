@@ -2,12 +2,24 @@ package com.appdevg5.powerpuff.citucare.dto;
 
 public class RegisterRequestDto {
 
+    private String studentId;
     private String fname;
     private String lname;
+    private String middleInitial;
+
     private String email;
     private String password;
     private String confirmPassword;
+
     private Long departmentId;
+
+    public String getStudentId() {
+        return studentId;
+    }
+
+    public void setStudentId(String studentId) {
+        this.studentId = studentId;
+    }
 
     public String getFname() {
         return fname;
@@ -23,6 +35,14 @@ public class RegisterRequestDto {
 
     public void setLname(String lname) {
         this.lname = lname;
+    }
+
+    public String getMiddleInitial() {
+        return middleInitial;
+    }
+
+    public void setMiddleInitial(String middleInitial) {
+        this.middleInitial = middleInitial;
     }
 
     public String getEmail() {
