@@ -1,41 +1,47 @@
 import React from "react";
-import { MessageCircle } from "lucide-react";
-import Message from "./Message";
-import TypingIndicator from "./TypingIndicator";
 
-export type ChatMessage = {
-  id?: string | number;
-  sender?: "user" | "bot" | string;
-  text?: string;
-  timestamp?: any;
-  [key: string]: any;
-};
+const MessageList = ({ messages, isLoading }) => {
 
-type MessageListProps = {
-  messages: ChatMessage[];
-  isLoading: boolean;
-};
-
-const MessageList = ({ messages, isLoading }: MessageListProps) => {
   return (
-    <div className="flex-1 overflow-y-auto bg-gradient-to-b from-white to-gray-50 px-4 py-6">
-      <div className="max-w-3xl mx-auto space-y-4">
-        {messages.length === 0 ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center">
-              <MessageCircle size={48} className="mx-auto text-gray-300 mb-4" />
-              <p className="text-gray-500">No messages yet. Start a conversation!</p>
+    <div className="flex-1 overflow-y-auto px-6 py-6 bg-gray-50">
+
+      <div className="max-w-3xl mx-auto space-y-6">
+
+        {messages.map((msg) => (
+          <div
+            key={msg.id}
+            className={`flex ${
+              msg.sender === "user" ? "justify-end" : "justify-start"
+            }`}
+          >
+
+            <div
+              className={`
+                max-w-[70%] px-4 py-3 rounded-2xl shadow-sm
+                ${
+                  msg.sender === "user"
+                    ? "bg-indigo-600 text-white rounded-br-sm"
+                    : "bg-white text-gray-800 border rounded-bl-sm"
+                }
+              `}
+            >
+              {msg.text}
+            </div>
+
+          </div>
+        ))}
+
+        {/* Typing indicator */}
+        {isLoading && (
+          <div className="flex justify-start">
+            <div className="bg-white border px-4 py-2 rounded-xl text-gray-500">
+              Chatbot is typing...
             </div>
           </div>
-        ) : (
-          <>
-            {messages.map((message) => (
-              <Message key={message.id ?? `${Math.random()}`} message={message} />
-            ))}
-            {isLoading && <TypingIndicator />}
-          </>
         )}
+
       </div>
+
     </div>
   );
 };

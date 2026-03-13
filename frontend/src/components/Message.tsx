@@ -4,16 +4,18 @@ import { User, Bot } from 'lucide-react';
 import { formatDate } from '../utils/helpers';
 
 const Message = ({ message }) => {
+
   const isUser = message.sender === 'user';
 
   return (
-    <div className={`flex gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+    <div className={`flex gap-3 mb-4 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+
       {/* Avatar */}
       <div
         className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
           isUser
-            ? 'bg-red-700'
-            : 'bg-gradient-to-br from-red-700 to-amber-500'
+            ? 'bg-primary'
+            : 'bg-gradient-to-br from-primary to-amber-500'
         }`}
       >
         {isUser ? (
@@ -25,17 +27,24 @@ const Message = ({ message }) => {
 
       {/* Message Bubble */}
       <div
-        className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+        className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg shadow-sm ${
           isUser
-            ? 'bg-red-700 text-white rounded-br-none'
+            ? 'bg-primary text-white rounded-br-none'
             : 'bg-white text-gray-900 border border-gray-200 rounded-bl-none'
         }`}
       >
         <p className="text-sm">{message.text}</p>
-        <span className={`text-xs mt-1 block ${isUser ? 'text-red-100' : 'text-gray-500'}`}>
+
+        <span
+          className={`text-xs mt-1 block ${
+            isUser ? 'text-red-100' : 'text-gray-500'
+          }`}
+        >
           {formatDate(message.timestamp)}
         </span>
+
       </div>
+
     </div>
   );
 };
