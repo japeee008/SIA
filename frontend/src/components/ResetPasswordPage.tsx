@@ -61,7 +61,7 @@ const ResetPasswordPage = () => {
 
         <button
           onClick={handleReset}
-          className="w-full bg-gold text-white py-3 rounded hover:bg-yellow-500 transition"
+          className="w-full bg-gold text-black py-3 rounded hover:bg-yellow-500 transition"
         >
           Reset Password
         </button>

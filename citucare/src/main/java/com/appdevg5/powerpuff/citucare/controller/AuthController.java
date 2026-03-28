@@ -1,5 +1,6 @@
 package com.appdevg5.powerpuff.citucare.controller;
 
+import com.appdevg5.powerpuff.citucare.entity.User;
 import com.appdevg5.powerpuff.citucare.dto.UserLoginRequestDto;
 import com.appdevg5.powerpuff.citucare.dto.AdminLoginRequestDto;
 import com.appdevg5.powerpuff.citucare.dto.AdminLoginResponseDto;
@@ -21,9 +22,9 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody UserLoginRequestDto request) {
-        String response = authService.loginUser(request);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<User> loginUser(@RequestBody UserLoginRequestDto request) {
+        User user = authService.loginUser(request);
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping("/admin/login")
@@ -58,6 +59,18 @@ public class AuthController {
         String password = body.get("password");
 
         String response = authService.resetPassword(token,password);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody Map<String, String> body) {
+
+        Long userId = Long.parseLong(body.get("userId"));
+        String currentPassword = body.get("currentPassword");
+        String newPassword = body.get("newPassword");
+
+        String response = authService.changePassword(userId, currentPassword, newPassword);
 
         return ResponseEntity.ok(response);
     }

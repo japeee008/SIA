@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
+import { supabase } from "../lib/supabase";
 
 interface Props {
   isOpen: boolean;
@@ -14,14 +15,174 @@ const SettingsModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
+  /* ---------------- AVATAR ---------------- */
+
+  const avatarUrl = user?.userId
+    ? `https://bnygvxesmbiumvwrjjmy.supabase.co/storage/v1/object/public/profile-photos/avatars/${user.userId}.jpg`
+    : "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+
+  const [profilePhoto, setProfilePhoto] = useState(
+    `${avatarUrl}?t=${Date.now()}`
+  );
+
+  /* ---------------- PROFILE EDIT ---------------- */
+
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+
+  const [firstName, setFirstName] = useState(user?.fname || "");
+  const [lastName, setLastName] = useState(user?.lname || "");
+
+  const handleSaveProfile = async () => {
+
+  try {
+
+    const res = await fetch(`http://localhost:8080/api/users/${user.userId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        fname: firstName,
+        lname: lastName,
+        email: user.email,
+        role: user.role
+      })
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      alert(text);
+      return;
+    }
+
+    const updatedUser = {
+      ...user,
+      fname: firstName,
+      lname: lastName
+    };
+
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+
+    alert("Profile updated");
+    setIsEditingProfile(false);
+
+  } catch (err) {
+    console.error(err);
+    alert("Server error");
+  }
+
+};
+
+  /* ---------------- PASSWORD STATES ---------------- */
+
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  /* ---------------- LOGOUT ---------------- */
+
   const handleLogout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("isAdmin");
     navigate("/", { replace: true });
   };
 
+  /* ---------------- CHAT ---------------- */
+
   const handleClearChat = () => {
     alert("Chat history cleared");
+  };
+
+  /* ---------------- PHOTO UPLOAD ---------------- */
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+
+    const file = e.target.files?.[0];
+    e.target.value = "";
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Only image files allowed");
+      return;
+    }
+
+    if (!user?.userId) {
+      alert("User not found");
+      return;
+    }
+
+    const filePath = `avatars/${user.userId}.jpg`;
+
+    const { error } = await supabase.storage
+      .from("profile-photos")
+      .upload(filePath, file, {
+        upsert: true,
+        contentType: file.type
+      });
+
+    if (error) {
+      console.error(error);
+      alert(error.message);
+      return;
+    }
+
+    const { data } = supabase.storage
+      .from("profile-photos")
+      .getPublicUrl(filePath);
+
+    const photoUrl = `${data.publicUrl}?t=${Date.now()}`;
+
+    setProfilePhoto(photoUrl);
+  };
+
+  /* ---------------- CHANGE PASSWORD ---------------- */
+
+  const handleChangePassword = async () => {
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      alert("Please fill all fields");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      alert("New passwords do not match");
+      return;
+    }
+
+    try {
+
+      const res = await fetch("http://localhost:8080/api/auth/change-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          userId: user.userId,
+          currentPassword,
+          newPassword
+        })
+      });
+
+      const text = await res.text();
+
+      if (!res.ok) {
+        alert(text);
+        return;
+      }
+
+      alert("Password updated successfully");
+
+      setShowPasswordForm(false);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+
+    } catch (err) {
+      console.error(err);
+      alert("Server error");
+    }
   };
 
   if (!isOpen) return null;
@@ -33,13 +194,11 @@ const SettingsModal: React.FC<Props> = ({ isOpen, onClose }) => {
       onClick={onClose}
     >
 
-      {/* Modal */}
       <div
         className="bg-white w-[900px] h-[520px] rounded-lg shadow-xl flex overflow-hidden relative"
         onClick={(e) => e.stopPropagation()}
       >
 
-        {/* Close button */}
         <button
           onClick={onClose}
           className="absolute right-4 top-4 text-gray-500 hover:text-black"
@@ -47,7 +206,6 @@ const SettingsModal: React.FC<Props> = ({ isOpen, onClose }) => {
           <X size={20}/>
         </button>
 
-        {/* LEFT MENU */}
         <div className="w-[260px] bg-primary text-white flex flex-col p-6 space-y-6">
 
           <button
@@ -92,47 +250,86 @@ const SettingsModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
         </div>
 
-        {/* RIGHT CONTENT */}
         <div className="flex-1 p-8 overflow-y-auto">
 
-          {/* GENERAL */}
-          {activeTab === "general" && (
-            <div>
-
-              <h2 className="text-xl font-semibold mb-6">
-                General Settings
-              </h2>
-
-              <button
-                onClick={handleClearChat}
-                className="border px-4 py-2 rounded hover:bg-gray-100"
-              >
-                Clear Chat History
-              </button>
-
-              <div className="mt-8">
-
-                <label className="block mb-2 font-medium">
-                  Language Preference
-                </label>
-
-                <select className="border px-3 py-2 rounded">
-                  <option>English</option>
-                  <option>Filipino</option>
-                </select>
-
-              </div>
-
-            </div>
-          )}
-
-          {/* ACCOUNT */}
           {activeTab === "account" && (
             <div>
 
               <h2 className="text-xl font-semibold mb-6">
                 Account
               </h2>
+
+              {/* PROFILE PHOTO */}
+
+              <div className="mb-8">
+
+                <label className="block font-medium mb-3">
+                  Profile Photo
+                </label>
+
+                <div className="flex items-center gap-6">
+
+                  <img
+                    src={profilePhoto}
+                    alt="Profile"
+                    className="w-20 h-20 rounded-full object-cover border"
+                  />
+
+                  {isEditingProfile && (
+                    <div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePhotoUpload}
+                        className="text-sm"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        JPG or PNG recommended
+                      </p>
+                    </div>
+                  )}
+
+                </div>
+
+              </div>
+
+              {/* FULL NAME */}
+
+              <div className="mb-4">
+
+                <label className="block font-medium mb-2">
+                  Full Name
+                </label>
+
+                {isEditingProfile ? (
+
+                  <div className="flex gap-2">
+
+                    <input
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      placeholder="First Name"
+                      className="border px-3 py-2 rounded w-full"
+                    />
+
+                    <input
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      placeholder="Last Name"
+                      className="border px-3 py-2 rounded w-full"
+                    />
+
+                  </div>
+
+                ) : (
+
+                  <p className="text-gray-700">
+                    {user?.fname} {user?.lname}
+                  </p>
+
+                )}
+
+              </div>
 
               <p className="mb-2">
                 <strong>Email:</strong> {user?.email || "Not available"}
@@ -145,51 +342,99 @@ const SettingsModal: React.FC<Props> = ({ isOpen, onClose }) => {
                   : "Student"}
               </p>
 
-              <button
-                className="border px-4 py-2 rounded hover:bg-gray-100"
-                onClick={() => alert("Change password coming soon")}
-              >
-                Change Password
-              </button>
+              {/* EDIT PROFILE BUTTONS */}
 
-            </div>
-          )}
+              {!isEditingProfile ? (
 
-          {/* PERSONALIZATION */}
-          {activeTab === "personalization" && (
-            <div>
+                <button
+                  onClick={() => setIsEditingProfile(true)}
+                  className="bg-yellow-500 text-black px-4 py-2 rounded hover:opacity-90"
+                >
+                  Edit Profile
+                </button>
 
-              <h2 className="text-xl font-semibold mb-6">
-                Personalization
-              </h2>
+              ) : (
 
-              <div className="mb-6">
+                <div className="flex gap-3 mb-6">
 
-                <label className="block mb-2 font-medium">
-                  Chat Theme
-                </label>
+                  <button
+                    onClick={() => setIsEditingProfile(false)}
+                    className="border px-4 py-2 rounded"
+                  >
+                    Cancel
+                  </button>
 
-                <select className="border px-3 py-2 rounded">
-                  <option>Default</option>
-                  <option>Dark</option>
-                  <option>CIT-U Red</option>
-                </select>
+                  <button
+                    onClick={handleSaveProfile}
+                    className="bg-yellow-500 text-black px-4 py-2 rounded"
+                  >
+                    Save
+                  </button>
 
-              </div>
+                </div>
 
-              <div>
+              )}
 
-                <label className="block mb-2 font-medium">
-                  Font Size
-                </label>
+              {/* CHANGE PASSWORD */}
 
-                <select className="border px-3 py-2 rounded">
-                  <option>Small</option>
-                  <option>Medium</option>
-                  <option>Large</option>
-                </select>
+              {!showPasswordForm ? (
 
-              </div>
+                <button
+                  className="border px-4 py-2 rounded hover:bg-gray-100"
+                  onClick={() => setShowPasswordForm(true)}
+                >
+                  Change Password
+                </button>
+
+              ) : (
+
+                <div className="space-y-3 max-w-sm">
+
+                  <input
+                    type="password"
+                    placeholder="Current Password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    className="w-full border px-3 py-2 rounded"
+                  />
+
+                  <input
+                    type="password"
+                    placeholder="New Password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="w-full border px-3 py-2 rounded"
+                  />
+
+                  <input
+                    type="password"
+                    placeholder="Confirm New Password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full border px-3 py-2 rounded"
+                  />
+
+                  <div className="flex gap-2">
+
+                    <button
+                      onClick={() => setShowPasswordForm(false)}
+                      className="border px-4 py-2 rounded"
+                    >
+                      Cancel
+                    </button>
+
+                    <button
+                      onClick={handleChangePassword}
+                      className="bg-yellow-500 text-black px-4 py-2 rounded"
+                    >
+                      Update Password
+                    </button>
+
+                  </div>
+
+                </div>
+
+              )}
 
             </div>
           )}
@@ -199,7 +444,6 @@ const SettingsModal: React.FC<Props> = ({ isOpen, onClose }) => {
       </div>
 
     </div>
-
   );
 };
 

@@ -15,6 +15,8 @@ const RegisterPage: React.FC = () => {
     middleInitial: ""
   });
 
+  const [error, setError] = useState("");
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
@@ -24,13 +26,15 @@ const RegisterPage: React.FC = () => {
 
   const handleRegister = async () => {
 
+    setError("");
+
     if (!formData.email.endsWith("@cit.edu") && !formData.email.endsWith("@cit.edu.ph")) {
-      alert("Please use your CIT-U institutional email");
+      setError("Please use your CIT-U institutional email.");
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match");
+      setError("Passwords do not match.");
       return;
     }
 
@@ -49,12 +53,12 @@ const RegisterPage: React.FC = () => {
         navigate("/");
       } else {
         const text = await res.text();
-        alert(text || "Registration failed");
+        setError(text || "Registration failed.");
       }
 
     } catch (err) {
       console.error(err);
-      alert("Server error");
+      setError("Server error. Please try again.");
     }
 
   };
@@ -68,6 +72,12 @@ const RegisterPage: React.FC = () => {
         <h2 className="text-2xl font-bold text-gray-900 text-center">
           Register
         </h2>
+
+        {error && (
+          <div className="bg-red-100 text-red-700 border border-red-300 px-3 py-2 rounded-lg text-sm text-center">
+            {error}
+          </div>
+        )}
 
         <div className="space-y-3">
 
