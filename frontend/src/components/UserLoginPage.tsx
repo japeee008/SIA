@@ -140,7 +140,7 @@ const LoginPage = () => {
           <button
             type="button"
             onClick={() => navigate("/register")}
-            className="text-red-500 font-medium hover:underline"
+            className="text-maroon font-medium hover:underline"
           >
             Register here
           </button>

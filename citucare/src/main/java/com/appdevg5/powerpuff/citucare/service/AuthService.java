@@ -85,25 +85,25 @@ public class AuthService {
         return dto;
     }
 
-    public String loginUser(UserLoginRequestDto request) {
+        public User loginUser(UserLoginRequestDto request) {
 
-        if (request.getEmail() == null || request.getPassword() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Email and password are required");
+            if (request.getEmail() == null || request.getPassword() == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Email and password are required");
+            }
+
+            User user = userRepository.findByEmailIgnoreCase(request.getEmail())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Invalid email or password"));
+
+            if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Invalid email or password");
+            }
+
+            if (user.getRole() != Role.USER) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,"User is not authorized");
+            }
+
+            return user;
         }
-
-        User user = userRepository.findByEmailIgnoreCase(request.getEmail())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Invalid email or password"));
-
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Invalid email or password");
-        }
-
-        if (user.getRole() != Role.USER) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"User is not authorized");
-        }
-
-        return "User login successful";
-    }
 
     public String register(RegisterRequestDto request) {
 
@@ -173,4 +173,21 @@ public class AuthService {
 
         return "Password reset successful";
     }
+
+    public String changePassword(Long userId, String currentPassword, String newPassword) {
+
+    User user = userRepository.findById(userId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+    if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Current password incorrect");
+    }
+
+    user.setPassword(passwordEncoder.encode(newPassword));
+    user.setUpdatedAt(LocalDateTime.now());
+
+    userRepository.save(user);
+
+    return "Password updated successfully";
+}
 }
