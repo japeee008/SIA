@@ -11,7 +11,7 @@ const Sidebar = ({
   openSettings,
   chatHistory,
   onSelectHistory
-}) => {
+}: any) => {
   return (
     <>
       {isOpen && (
@@ -33,7 +33,7 @@ const Sidebar = ({
             src="/wildcare.jpg"
             alt="CITU CARE Logo"
             className="w-32 h-32 object-contain"
-            onError={(e) => (e.target.style.display = "none")}
+            onError={(e) => ((e.target as HTMLImageElement).style.display = "none")}
           />
         </div>
 
@@ -50,7 +50,7 @@ const Sidebar = ({
         </button>
 
         {/* Chat History */}
-        {chatHistory.length > 0 && (
+        {chatHistory?.length > 0 && (
           <div className="px-4 pb-2">
 
             <p className="text-xs font-semibold text-gray-400 mb-2">
@@ -59,7 +59,7 @@ const Sidebar = ({
 
             <div className="space-y-1">
 
-              {chatHistory.map((chat, i) => (
+              {chatHistory.map((chat: any, i: number) => (
                 <button
                   key={i}
                   onClick={() => {
@@ -81,14 +81,14 @@ const Sidebar = ({
         {/* Categories */}
         <div className="flex-1 overflow-y-auto px-4 space-y-2">
 
-          {categories.length > 0 && (
+          {categories?.length > 0 && (
             <div className="py-4 border-t border-gray-800">
 
               <p className="text-xs font-semibold text-gray-400 mb-3">
                 EXPLORE TOPICS
               </p>
 
-              {categories.map((category) => (
+              {categories.map((category: any) => (
                 <button
                   key={category.id}
                   onClick={() => {

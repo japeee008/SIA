@@ -1,7 +1,7 @@
 // frontend/src/components/AdminComponents/AdminDashboard.jsx
 import React, { useEffect, useState } from 'react';
 import { Users, MessageSquare, Layers, BookOpen } from 'lucide-react';
-import chatService from '../../services/chatService';
+import chatService from '../../../services/chatService';
 import axios from 'axios';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';

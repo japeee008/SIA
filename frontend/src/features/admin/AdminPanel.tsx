@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import AdminSidebar from "../components/AdminSidebar";
-import CategoryManager from "../components/AdminComponents/CategoryManager";
-import AdminDashboard from "../components/AdminComponents/AdminDashboard";
-import DepartmentManager from "../components/AdminComponents/DepartmentManager";
-import KnowledgeBaseManager from "../components/AdminComponents/KnowledgeBaseManager";
-import UserManager from "../components/AdminComponents/UserManager";
+import AdminSidebar from './AdminSidebar';
+import CategoryManager from './AdminComponents/CategoryManager';
+import AdminDashboard from './AdminComponents/AdminDashboard';
+import DepartmentManager from './AdminComponents/DepartmentManager';
+import KnowledgeBaseManager from './AdminComponents/KnowledgeBaseManager';
+import UserManager from './AdminComponents/UserManager';
 
 const AdminPanel: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>("dashboard");

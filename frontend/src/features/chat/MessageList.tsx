@@ -1,13 +1,13 @@
 import React from "react";
 
-const MessageList = ({ messages, isLoading }) => {
+const MessageList = ({ messages, isLoading }: any) => {
 
   return (
     <div className="flex-1 overflow-y-auto px-6 py-6 bg-gray-50">
 
       <div className="max-w-3xl mx-auto space-y-6">
 
-        {messages.map((msg) => (
+        {messages.map((msg: any) => (
           <div
             key={msg.id}
             className={`flex ${
