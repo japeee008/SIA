@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { User, Bot } from 'lucide-react';
-import { formatDate } from '../utils/helpers';
+import { formatDate } from '../../utils/helpers';
 
-const Message = ({ message }) => {
+const Message = ({ message }: any) => {
 
   const isUser = message.sender === 'user';
 

@@ -1,18 +1,18 @@
 import React from 'react';
-import AdminRoute from "./routes/AdminRoute";
+import AdminRoute from "./features/admin/AdminRoute";
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
-import ChatContainer from './components/ChatContainer';
-import AdminPanel from './pages/AdminPanel';
-import LoginPage from './components/LoginPage';
-import RegisterPage from "./components/RegisterPage";
-import UserLoginPage from "./components/UserLoginPage";
+import ChatContainer from './features/chat/ChatContainer';
+import AdminPanel from './features/admin/AdminPanel';
+import LoginPage from './features/auth/LoginPage';
+import RegisterPage from "./features/auth/RegisterPage";
+import UserLoginPage from "./features/auth/UserLoginPage";
 
-import ForgotPasswordPage from "./components/ForgotPasswordPage";
-import ResetPasswordPage from "./components/ResetPasswordPage";
+import ForgotPasswordPage from "./features/auth/ForgotPasswordPage";
+import ResetPasswordPage from "./features/auth/ResetPasswordPage";
 
 import ErrorBoundary from './components/ErrorBoundary';
-import { ChatProvider } from './context/ChatContext';
+import { ChatProvider } from './features/chat/ChatContext';
 
 function App() {
   return (

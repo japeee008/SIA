@@ -7,7 +7,7 @@ import {
   AlertCircle,
   CheckCircle,
 } from "lucide-react";
-import chatService from "../../services/chatService";
+import chatService from "../../../services/chatService";
 
 /* ================= TYPES ================= */
 
