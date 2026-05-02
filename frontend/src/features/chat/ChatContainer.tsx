@@ -3,10 +3,9 @@ import ChatHeader from './ChatHeader';
 import MessageList from './MessageList';
 import MessageInput from './MessageInput';
 import Sidebar from './Sidebar';
-import ErrorAlert from './ErrorAlert';
-import { useChat } from '../context/ChatContext';
-import { createMessage, validateMessage, handleApiError } from "../utils/helpers";
-import chatService from "../services/chatService";
+import { useChat } from './ChatContext';
+import { createMessage, validateMessage, handleApiError } from '../../utils/helpers';
+import chatService from '../../services/chatService';
 import SettingsModal from "./SettingsModal";
 
 const ChatContainer = () => {
@@ -163,7 +162,11 @@ const ChatContainer = () => {
 
     <div className="flex h-screen overflow-hidden">
 
-      <ErrorAlert message={error} onClose={clearError} />
+      {error && (
+        <div className="fixed top-4 right-4 z-50 bg-red-100 text-red-700 px-4 py-2 rounded shadow">
+          {error}
+        </div>
+      )}
 
       <Sidebar
         isOpen={isSidebarOpen}
