@@ -105,8 +105,12 @@ const KnowledgeBaseManager: React.FC = () => {
   const adminDeptName: string =
     adminUser?.department?.deptName ?? adminUser?.departmentName ?? "My Department";
 
+  const normalizedRole = String(adminUser?.role || "")
+    .replace(/[_\s-]/g, "")
+    .toLowerCase();
+
   const isSuperAdmin: boolean =
-    adminUser?.role === "SuperAdmin" || adminUser?.isSuperAdmin === true;
+    normalizedRole === "superadmin" || adminUser?.isSuperAdmin === true;
 
   const displayName: string = adminUser
     ? `${adminUser.fname || ""} ${adminUser.lname || ""}`.trim() || "Admin"
