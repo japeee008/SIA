@@ -15,7 +15,6 @@ import com.appdevg5.powerpuff.citucare.features.kb.KnowledgeBaseService;
 
 @RestController
 @RequestMapping("/api/chat")
-@CrossOrigin(origins = "http://localhost:3000") // add if frontend is React on 3000
 public class ChatController {
 
     @Autowired
@@ -25,31 +24,40 @@ public class ChatController {
     private SessionService sessionService;
 
     @Autowired
-    private KnowledgeBaseService knowledgeBaseService; // ✅ NEW
+    private KnowledgeBaseService knowledgeBaseService;
 
     @PostMapping
     public ResponseEntity<?> sendMessage(@RequestBody Map<String, Object> payload) {
         String messageText = (String) payload.get("message");
+
+        if (messageText == null || messageText.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Message is required"));
+        }
+
+        if (payload.get("userId") == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "User ID is required"));
+        }
+
+        Long userId = ((Number) payload.get("userId")).longValue();
+
         Long sessionId = payload.get("sessionId") == null
                 ? null
                 : ((Number) payload.get("sessionId")).longValue();
 
-        // 1) Create or update session
         Session session;
+
         if (sessionId == null) {
-            session = sessionService.createSession();
+            session = sessionService.createSession(userId);
         } else {
-            session = sessionService.touchSession(sessionId);
+            session = sessionService.touchSession(sessionId, userId);
             if (session == null) {
-                session = sessionService.createSession();
+                session = sessionService.createSession(userId);
             }
         }
 
-        // 2) Save user message
         Message userMsg = new Message(session, messageText, null, LocalDateTime.now(), null);
         messageService.save(userMsg);
 
-        // 3) Find matching KB entry
         KnowledgeBase matchedKb = knowledgeBaseService.findMatchingKnowledgeBase(messageText);
 
         String botReply;
@@ -60,14 +68,12 @@ public class ChatController {
             category = matchedKb.getCategory();
         } else {
             botReply = "I'm sorry, I don't have an answer for that yet. " +
-                       "Please try rephrasing your question or contact the appropriate department.";
+                    "Please try rephrasing your question or contact the appropriate department.";
         }
 
-        // 4) Save bot message (with category if found)
         Message botMsg = new Message(session, null, botReply, LocalDateTime.now(), category);
         messageService.save(botMsg);
 
-        // 5) Prepare response
         Map<String, Object> resp = new HashMap<>();
         resp.put("sessionId", session.getSessionId());
         resp.put("reply", botReply);
@@ -76,8 +82,20 @@ public class ChatController {
     }
 
     @GetMapping("/history")
-    public List<Message> history(@RequestParam(required = false) Long sessionId) {
-        if (sessionId != null) return messageService.findBySessionId(sessionId);
-        return messageService.findAll();
+    public List<MessageDto> history(
+            @RequestParam Long userId,
+            @RequestParam(required = false) Long sessionId
+    ) {
+        List<Message> messages;
+
+        if (sessionId != null) {
+            messages = messageService.findBySessionIdAndUserId(sessionId, userId);
+        } else {
+            messages = messageService.findByUserId(userId);
+        }
+
+        return messages.stream()
+                .map(MessageDto::new)
+                .toList();
     }
 }
