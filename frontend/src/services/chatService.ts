@@ -1,14 +1,23 @@
+/// <reference types="node" />
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
+const API_BASE_URL =
+  process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
 
 const chatService = {
-  // Send a message to the chatbot
-  sendMessage: async (message) => {
+  // Send message
+  sendMessage: async (
+    message: string,
+    userId: number,
+    sessionId?: number | null
+  ) => {
     try {
       const response = await axios.post(`${API_BASE_URL}/chat`, {
         message,
+        userId,
+        sessionId,
       });
+
       return response.data;
     } catch (error) {
       console.error('Error sending message:', error);
@@ -17,9 +26,19 @@ const chatService = {
   },
 
   // Get chat history
-  getChatHistory: async () => {
+  getChatHistory: async (
+    userId: number,
+    sessionId?: number | null
+  ) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/chat/history`);
+      let url = `${API_BASE_URL}/chat/history?userId=${userId}`;
+
+      if (sessionId) {
+        url += `&sessionId=${sessionId}`;
+      }
+
+      const response = await axios.get(url);
+
       return response.data;
     } catch (error) {
       console.error('Error fetching chat history:', error);
@@ -27,7 +46,7 @@ const chatService = {
     }
   },
 
-  // Get available categories
+  // Categories
   getCategories: async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/categories`);
@@ -38,10 +57,13 @@ const chatService = {
     }
   },
 
-  // Create a new category
-  createCategory: async (category) => {
+  createCategory: async (category: any) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/categories`, category);
+      const response = await axios.post(
+        `${API_BASE_URL}/categories`,
+        category
+      );
+
       return response.data;
     } catch (error) {
       console.error('Error creating category:', error);
@@ -49,13 +71,13 @@ const chatService = {
     }
   },
 
-  // Update a category
-  updateCategory: async (id, category) => {
+  updateCategory: async (id: number, category: any) => {
     try {
       const response = await axios.put(
         `${API_BASE_URL}/categories/${id}`,
         category
       );
+
       return response.data;
     } catch (error) {
       console.error('Error updating category:', error);
@@ -63,8 +85,7 @@ const chatService = {
     }
   },
 
-  // Delete a category
-  deleteCategory: async (id) => {
+  deleteCategory: async (id: number) => {
     try {
       await axios.delete(`${API_BASE_URL}/categories/${id}`);
     } catch (error) {

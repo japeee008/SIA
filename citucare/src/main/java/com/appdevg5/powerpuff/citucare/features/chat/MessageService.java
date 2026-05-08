@@ -14,11 +14,11 @@ public class MessageService {
         return messageRepository.save(message);
     }
 
-    public List<Message> findBySessionId(Long sessionId) {
-        return messageRepository.findBySession_SessionId(sessionId);
+    public List<Message> findByUserId(Long userId) {
+        return messageRepository.findBySession_User_UserIdOrderByTimestampAsc(userId);
     }
 
-    public List<Message> findAll() {
-        return messageRepository.findAll();
+    public List<Message> findBySessionIdAndUserId(Long sessionId, Long userId) {
+        return messageRepository.findBySession_SessionIdAndSession_User_UserIdOrderByTimestampAsc(sessionId, userId);
     }
 }

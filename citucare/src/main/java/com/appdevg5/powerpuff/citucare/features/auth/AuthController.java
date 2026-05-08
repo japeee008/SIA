@@ -8,16 +8,15 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:3000")
 public class AuthController {
 
     @Autowired
     private AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<User> loginUser(@RequestBody UserLoginRequestDto request) {
-        User user = authService.loginUser(request);
-        return ResponseEntity.ok(user);
+    public ResponseEntity<UserLoginResponseDto> loginUser(@RequestBody UserLoginRequestDto request) {
+            User user = authService.loginUser(request);
+            return ResponseEntity.ok(new UserLoginResponseDto(user));
     }
 
     @PostMapping("/admin/login")

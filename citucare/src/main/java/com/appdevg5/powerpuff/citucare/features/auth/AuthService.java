@@ -24,15 +24,6 @@ public class AuthService {
     private PasswordEncoder passwordEncoder;
 
     @PostConstruct
-    public void forceResetSuperAdminPassword() {
-        userRepository.findByEmailIgnoreCase("superadmin@cit.edu")
-            .ifPresent(user -> {
-                user.setPassword(passwordEncoder.encode("admin123"));
-                userRepository.save(user);
-            });
-    }
-
-    @PostConstruct
     public void migratePlainPasswordsToBCrypt() {
 
         userRepository.findAll().forEach(user -> {
