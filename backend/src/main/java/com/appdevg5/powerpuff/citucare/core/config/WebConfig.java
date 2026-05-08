@@ -16,7 +16,7 @@ public class WebConfig {
                 registry.addMapping("/**")
                         .allowedOrigins("http://localhost:3000",
                                         "http://localhost:5173",
-                                        "https://YOUR-VERCEL-APP.vercel.app"
+                                        "https://citucare-frontend.vercel.app/"
                                     )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
