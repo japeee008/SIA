@@ -21,7 +21,7 @@ const ResetPasswordPage = () => {
     try {
 
       await axios.post(
-        "http://localhost:8080/api/auth/reset-password",
+        "https://citucare-backend.onrender.com/api/auth/reset-password",
         {
           token: token,
           password: password

@@ -36,7 +36,7 @@ const SettingsModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
   try {
 
-    const res = await fetch(`http://localhost:8080/api/users/${user.userId}`, {
+    const res = await fetch(`https://citucare-backend.onrender.com/api/users/${user.userId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json"
@@ -153,7 +153,7 @@ const SettingsModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
     try {
 
-      const res = await fetch("http://localhost:8080/api/auth/change-password", {
+      const res = await fetch("https://citucare-backend.onrender.com/api/auth/change-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

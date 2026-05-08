@@ -12,7 +12,7 @@ const LoginPage = () => {
     e.preventDefault();
     setError(null);
     // call backend login endpoint
-    axios.post('http://localhost:8080/api/auth/admin/login', {
+    axios.post('https://citucare-backend.onrender.com/api/auth/admin/login', {
       email,
       password
     }).then(res => {
