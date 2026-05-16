@@ -4,10 +4,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Long> {
     List<Message> findBySession_SessionId(Long sessionId);
+
     List<Message> findBySession_User_UserIdOrderByTimestampAsc(Long userId);
+
     List<Message> findBySession_SessionIdAndSession_User_UserIdOrderByTimestampAsc(Long sessionId, Long userId);
+
+    Optional<Message> findFirstBySession_SessionIdAndMessageTextIsNotNullOrderByTimestampAsc(Long sessionId);
 }

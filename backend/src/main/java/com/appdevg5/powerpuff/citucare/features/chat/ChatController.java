@@ -81,6 +81,11 @@ public class ChatController {
         return ResponseEntity.ok(resp);
     }
 
+    @GetMapping("/sessions")
+    public List<SessionDto> sessions(@RequestParam Long userId) {
+        return sessionService.getSessionsByUserId(userId);
+    }
+
     @GetMapping("/history")
     public List<MessageDto> history(
             @RequestParam Long userId,

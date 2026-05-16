@@ -8,12 +8,16 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class SessionService {
 
     @Autowired
     private SessionRepository sessionRepository;
+
+    @Autowired
+    private MessageRepository messageRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -37,5 +41,24 @@ public class SessionService {
                     return sessionRepository.save(s);
                 })
                 .orElse(null);
+    }
+
+    public List<SessionDto> getSessionsByUserId(Long userId) {
+        List<Session> sessions = sessionRepository.findByUser_UserIdOrderByLastActivityAtDesc(userId);
+
+        return sessions.stream()
+                .map(session -> {
+                    String title = messageRepository
+                            .findFirstBySession_SessionIdAndMessageTextIsNotNullOrderByTimestampAsc(session.getSessionId())
+                            .map(Message::getMessageText)
+                            .orElse("New Chat");
+
+                    if (title.length() > 35) {
+                        title = title.substring(0, 35) + "...";
+                    }
+
+                    return new SessionDto(session, title);
+                })
+                .toList();
     }
 }
