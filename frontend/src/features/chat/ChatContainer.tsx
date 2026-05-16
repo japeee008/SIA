@@ -1,11 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
-import ChatHeader from './ChatHeader';
-import MessageList from './MessageList';
-import MessageInput from './MessageInput';
-import Sidebar from './Sidebar';
-import { useChat } from './ChatContext';
-import { createMessage, validateMessage, handleApiError } from '../../utils/helpers';
-import chatService from '../../services/chatService';
+import React, { useState, useEffect, useRef } from "react";
+import ChatHeader from "./ChatHeader";
+import MessageList from "./MessageList";
+import MessageInput from "./MessageInput";
+import Sidebar from "./Sidebar";
+import { useChat } from "./ChatContext";
+import {
+  createMessage,
+  validateMessage,
+  handleApiError
+} from "../../utils/helpers";
+import chatService from "../../services/chatService";
 import SettingsModal from "./SettingsModal";
 
 const ChatContainer = () => {
@@ -40,7 +44,7 @@ const ChatContainer = () => {
   ];
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   const formatBackendMessages = (history: any[]) => {
@@ -48,7 +52,7 @@ const ChatContainer = () => {
       id: index + 1,
       text: msg.messageText || msg.botReply,
       sender: msg.messageText ? "user" : "bot",
-      timestamp: new Date(msg.timestamp),
+      timestamp: new Date(msg.timestamp)
     }));
   };
 
@@ -56,42 +60,31 @@ const ChatContainer = () => {
     const grouped: any = {};
 
     history.forEach((msg) => {
-
       if (!grouped[msg.sessionId]) {
-
         grouped[msg.sessionId] = {
           sessionId: msg.sessionId,
           title: msg.messageText || "New Chat",
-          messages: [],
+          messages: []
         };
-
       }
 
       grouped[msg.sessionId].messages.push(msg);
-
     });
 
     return Object.values(grouped);
   };
 
   const loadUserHistory = async () => {
-
     if (!userId) return;
 
     try {
-
       const history = await chatService.getChatHistory(userId);
-
       const groupedHistory = groupMessagesBySession(history);
 
       setChatHistory(groupedHistory);
-
     } catch (err) {
-
       console.error("Failed to load chat history", err);
-
     }
-
   };
 
   useEffect(() => {
@@ -99,27 +92,19 @@ const ChatContainer = () => {
   }, [messages]);
 
   useEffect(() => {
-
     const loadCategories = async () => {
-
       try {
-
         const data = await chatService.getCategories();
 
         if (Array.isArray(data)) {
           setCategories(data);
         }
-
       } catch (err) {
-
-        console.error('Failed to load categories:', err);
-
+        console.error("Failed to load categories:", err);
       }
-
     };
 
     loadCategories();
-
   }, []);
 
   useEffect(() => {
@@ -127,55 +112,44 @@ const ChatContainer = () => {
   }, [userId]);
 
   useEffect(() => {
-
     const initialMessage = {
       id: 1,
       text: "Hello! 👋 I'm your chatbot assistant. How can I help you today?",
-      sender: 'bot',
-      timestamp: new Date(),
+      sender: "bot",
+      timestamp: new Date()
     };
 
     setMessages([initialMessage]);
-
   }, [setMessages]);
 
   const handleSendMessage = async (text: string) => {
-
     if (!validateMessage(text)) {
-      setErrorMessage('Please enter a valid message.');
+      setErrorMessage("Please enter a valid message.");
       return;
     }
 
     if (!userId) {
-      setErrorMessage('User not found. Please log in again.');
+      setErrorMessage("User not found. Please log in again.");
       return;
     }
 
-    const userMessage = createMessage(text, 'user', messages.length + 1);
-
+    const userMessage = createMessage(text, "user", messages.length + 1);
     const updatedMessages = [...messages, userMessage];
 
     setMessages(updatedMessages);
-
     setIsLoading(true);
-
     clearError();
 
     try {
-
-      const response = await chatService.sendMessage(
-        text,
-        userId,
-        sessionId
-      );
+      const response = await chatService.sendMessage(text, userId, sessionId);
 
       if (response.sessionId) {
         setSessionId(response.sessionId);
       }
 
       const botMessage = createMessage(
-        response.reply || 'Sorry, I could not process your message.',
-        'bot',
+        response.reply || "Sorry, I could not process your message.",
+        "bot",
         messages.length + 2
       );
 
@@ -184,64 +158,46 @@ const ChatContainer = () => {
       setMessages(finalMessages);
 
       await loadUserHistory();
-
     } catch (err) {
-
       const errorMsg = handleApiError(err);
-
       setErrorMessage(errorMsg);
-
     } finally {
-
       setIsLoading(false);
-
     }
-
   };
 
   const handleNewChat = () => {
-
     setSessionId(null);
 
     setMessages([
       {
         id: 1,
         text: "Hello! 👋 I'm your chatbot assistant. How can I help you today?",
-        sender: 'bot',
-        timestamp: new Date(),
-      },
+        sender: "bot",
+        timestamp: new Date()
+      }
     ]);
 
     setSelectedCategory(null);
-
   };
 
   const loadChatHistory = async (chat: any) => {
-
     try {
-
       const formatted = formatBackendMessages(chat.messages);
 
       setMessages(formatted);
-
       setSessionId(chat.sessionId);
-
     } catch (err) {
-
       console.error("Failed to load session history", err);
-
       setErrorMessage("Failed to load chat history.");
-
     }
-
   };
 
   const hasOnlyInitialBotMessage =
-    messages.length === 1 && messages[0]?.sender === 'bot';
+    messages.length === 1 && messages[0]?.sender === "bot";
 
   return (
     <div className="flex h-screen overflow-hidden">
-
       {error && (
         <div className="fixed top-4 right-4 z-50 bg-red-100 text-red-700 px-4 py-2 rounded shadow">
           {error}
@@ -261,22 +217,21 @@ const ChatContainer = () => {
       />
 
       <div className="flex-1 flex flex-col">
-
-        <ChatHeader onMenuClick={() => setIsSidebarOpen(true)} />
+        <ChatHeader
+          onMenuClick={() => setIsSidebarOpen(true)}
+          onProfileClick={() => setSettingsOpen(true)}
+        />
 
         <MessageList messages={messages} isLoading={isLoading} />
 
         {hasOnlyInitialBotMessage && (
           <div className="px-8 mt-2 mb-4">
-
             <p className="text-center text-gray-500 text-sm mb-3">
               You can start by asking one of these:
             </p>
 
             <div className="flex flex-wrap justify-center gap-3 max-w-3xl mx-auto">
-
               {suggestedQuestions.map((q, i) => (
-
                 <button
                   key={i}
                   onClick={() => handleSendMessage(q)}
@@ -288,25 +243,20 @@ const ChatContainer = () => {
                 >
                   {q}
                 </button>
-
               ))}
-
             </div>
-
           </div>
         )}
 
         <MessageInput onSendMessage={handleSendMessage} disabled={isLoading} />
 
         <div ref={messagesEndRef} />
-
       </div>
 
       <SettingsModal
         isOpen={settingsOpen}
         onClose={() => setSettingsOpen(false)}
       />
-
     </div>
   );
 };
